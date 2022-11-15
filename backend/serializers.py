@@ -35,6 +35,11 @@ class ShopSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'state',)
         read_only_fields = ('id',)
 
+class ProductsSerializer(serializers.ModelSerializer):
+    category = serializers.StringRelatedField()
+    class Meta:
+        model = Product
+        fields = ('id','name', 'category')
 
 class ProductSerializer(serializers.ModelSerializer):
     category = serializers.StringRelatedField()
@@ -55,10 +60,11 @@ class ProductParameterSerializer(serializers.ModelSerializer):
 class ProductInfoSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
     product_parameters = ProductParameterSerializer(read_only=True, many=True)
+    shop = serializers.StringRelatedField()
 
     class Meta:
         model = ProductInfo
-        fields = ('id', 'model', 'product', 'shop', 'quantity', 'price', 'price_rrc', 'product_parameters',)
+        fields = ('id', 'product', 'shop', 'quantity','price', 'price_rrc','product_parameters',)
         read_only_fields = ('id',)
 
 
@@ -86,3 +92,5 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ('id', 'ordered_items', 'state', 'dt', 'total_sum', 'contact',)
         read_only_fields = ('id',)
+
+

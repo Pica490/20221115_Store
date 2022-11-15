@@ -26,13 +26,6 @@ dotenv_path = os.path.join(BASE_DIR, '.env')
 if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
 
-DB_USER = os.getenv("DB_USER")
-DB_NAME = os.getenv("DB_NAME")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
-
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("SECRET_KEY")
 
@@ -137,7 +130,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -148,12 +141,11 @@ STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'backend.User'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_USE_TLS = True
 
-EMAIL_HOST = 'smtp.mail.ru'
-EMAIL_HOST_USER = 'netology-pdiplom@mail.ru'
-EMAIL_HOST_PASSWORD = 'i~8W4rdRPFlo'
-EMAIL_PORT = '465'
+EMAIL_HOST =os.getenv('EMAIL_HOST')
+EMAIL_HOST_USER =os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD =os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_PORT =os.getenv('EMAIL_PORT')
 EMAIL_USE_SSL = True
 SERVER_EMAIL = EMAIL_HOST_USER
 
@@ -168,8 +160,7 @@ REST_FRAMEWORK = {
     ),
 
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'rest_framework.authentication.SessionAuthentication',
-        # 'rest_framework.authentication.BasicAuthentication',
+
         'rest_framework.authentication.TokenAuthentication',
     ),
 

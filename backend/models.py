@@ -21,9 +21,6 @@ USER_TYPE_CHOICES = (
 
 )
 
-# Create your models here.
-
-
 class UserManager(BaseUserManager):
     """
     Миксин для управления пользователями
@@ -229,11 +226,6 @@ class Order(models.Model):
     def __str__(self):
         return str(self.dt)
 
-    # @property
-    # def sum(self):
-    #     return self.ordered_items.aggregate(total=Sum("quantity"))["total"]
-
-
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, verbose_name='Заказ', related_name='ordered_items', blank=True,
                               on_delete=models.CASCADE)
@@ -287,3 +279,6 @@ class ConfirmEmailToken(models.Model):
 
     def __str__(self):
         return "Password reset token for user {user}".format(user=self.user)
+
+
+
