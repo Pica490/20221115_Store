@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from backend.models import User, Category, Shop, ProductInfo, Product, ProductParameter, OrderItem, Order, Contact
+from backend.models import User, Shop, ProductInfo, Product, ProductParameter, OrderItem, Order, Contact
 
 
 class ContactSerializer(serializers.ModelSerializer):
@@ -20,14 +20,6 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'first_name', 'last_name', 'email', 'company', 'position', 'contacts')
         read_only_fields = ('id',)
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = ('id', 'name',)
-        read_only_fields = ('id',)
-
 
 class ShopSerializer(serializers.ModelSerializer):
     class Meta:
@@ -78,6 +70,17 @@ class OrderItemSerializer(serializers.ModelSerializer):
         }
 
 
+class ProductInfoSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+    product_parameters = ProductParameterSerializer(read_only=True, many=True)
+    shop = serializers.StringRelatedField()
+
+    class Meta:
+        model = ProductInfo
+        fields = ('id', 'product', 'shop', 'quantity','price', 'price_rrc','product_parameters',)
+        read_only_fields = ('id',)
+
+
 class OrderItemCreateSerializer(OrderItemSerializer):
     product_info = ProductInfoSerializer(read_only=True)
 
@@ -92,5 +95,30 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = ('id', 'ordered_items', 'state', 'dt', 'total_sum', 'contact',)
         read_only_fields = ('id',)
+
+class ProductInfoEmailSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+    shop = serializers.StringRelatedField()
+
+    class Meta:
+        model = ProductInfo
+        fields = ('product', 'shop', 'quantity','price',)
+
+
+class OrderItemEmailCreateSerializer(OrderItemSerializer):
+    product_info = ProductInfoEmailSerializer(read_only=True)
+
+class OrderEmailSerializer(serializers.ModelSerializer):
+    ordered_items = OrderItemEmailCreateSerializer(read_only=True, many=True)
+    total_sum = serializers.IntegerField()
+    contact = ContactSerializer(read_only=True)
+
+    class Meta:
+        model = Order
+        fields = ('ordered_items', 'total_sum', 'contact',)
+
+
+
+
 
 

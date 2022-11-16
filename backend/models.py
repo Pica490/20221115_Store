@@ -21,6 +21,7 @@ USER_TYPE_CHOICES = (
 
 )
 
+
 class UserManager(BaseUserManager):
     """
     Миксин для управления пользователями

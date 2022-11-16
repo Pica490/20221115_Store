@@ -1,8 +1,7 @@
 from django.urls import path
 
-from django_rest_passwordreset.views import reset_password_request_token, reset_password_confirm
 from backend.views import PartnerUpdate, RegisterAccount, ConfirmAccount, LoginAccount, \
-    AccountDetails,CategoryView, ShopView, ProductsView, ProductInfoView, BasketView,\
+    AccountDetails, ShopView, ProductsView, ProductInfoView, BasketView,\
     PartnerOrders, OrderView, PartnerState
 
 app_name = 'backend'
@@ -14,7 +13,6 @@ urlpatterns = [
     path('user/register/confirm', ConfirmAccount.as_view(), name='user-register-confirm'),
     path('user/details', AccountDetails.as_view(), name='user-details'),
     path('user/login', LoginAccount.as_view(), name='user-login'),
-    path('categories', CategoryView.as_view(), name='categories'),
     path('shops', ShopView.as_view(), name='shops'),
     path('products', ProductsView.as_view(), name='products'),
     path('product', ProductInfoView.as_view(), name='shops'),

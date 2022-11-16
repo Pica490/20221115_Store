@@ -58,18 +58,43 @@ def new_user_registered_signal(user_id, **kwargs):
     )
     msg.send()
 
+def message(user_id, id,data):
+
+    user = User.objects.get(id=user_id)
+
+    body = f'Номер вашего заказа: {id}\n' \
+           f'Наш оператор свяжется с вами в ближайшее время для уточнения делатей заказа.\n' \
+           f'Статуcы заказов вы можете посмотреть в разделе "Заказы".\n'
+
+    for item in data[0]['ordered_items']:
+        body += f'\nНаименование товара: {item["product_info"]["product"]["name"]}\n' \
+                 f'Магазин: {item["product_info"]["shop"]}\n' \
+                 f'Цена: {item["product_info"]["price"]} р.\n' \
+                 f'Количество: {item["product_info"]["quantity"]} \n'
+
+    body += f'\nСумма: {data[0]["total_sum"]} р.\n'
+    body += f'\nФамилия Имя: {user.first_name} {user.last_name}\n' \
+            f'Email: {user.email}\n' \
+            f'\nАдрес доставки: \n г.{data[0]["contact"]["city"]}, ул.{data[0]["contact"]["street"]}, ' \
+            f'д.{data[0]["contact"]["house"]}, к.{data[0]["contact"]["structure"]}, стр.{data[0]["contact"]["building"]},' \
+            f' кв.{data[0]["contact"]["apartment"]}\n' \
+            f'тел. {data[0]["contact"]["phone"]}'
+    return body
 
 @receiver(new_order)
-def new_order_signal(user_id, **kwargs):
+def new_order_signal(user_id, id, data, **kwargs):
+
+    user = User.objects.get(id=user_id)
+
+    body = message(user_id, id, data)
 
     # send an e-mail to the user
-    user = User.objects.get(id=user_id)
 
     msg = EmailMultiAlternatives(
         # title:
-        f"Обновление статуса заказа",
+        f"Спасибо за заказ!",
         # message:
-        'Спасибо за заказ!',
+        f'{body}',
         # from:
         settings.EMAIL_HOST_USER,
         # to:

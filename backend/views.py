@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate
+import json
 
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
@@ -17,8 +18,8 @@ from yaml import load as load_yaml, Loader
 from backend.models import Shop, Category, Contact, Product, ProductInfo, Parameter, Order, OrderItem, \
     ProductParameter, ConfirmEmailToken
 
-from backend.serializers import UserSerializer, CategorySerializer, ShopSerializer, ProductsSerializer, ProductInfoSerializer, \
-    OrderItemSerializer, OrderSerializer
+from backend.serializers import UserSerializer, ShopSerializer, ProductsSerializer, ProductInfoSerializer, \
+    OrderItemSerializer, OrderSerializer,OrderEmailSerializer
 from backend.signal import new_user_registered, new_order
 
 class RegisterAccount(APIView):
@@ -187,11 +188,6 @@ class PartnerUpdate(APIView):
                 return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
 
 
-class CategoryView(ListAPIView):
-
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-
 class ShopView(ListAPIView):
 
     queryset = Shop.objects.filter(state=True)
@@ -306,7 +302,7 @@ class BasketView(APIView):
                 objects_updated = 0
                 for order_item in items_dict:
                     if type(order_item['id']) == int and type(order_item['quantity']) == int:
-                        print(order_item['id'])
+
                         objects_updated += OrderItem.objects.filter(order_id=basket.id, id=order_item['id']).update(
                             quantity=order_item['quantity'])
 
@@ -375,7 +371,14 @@ class OrderView(APIView):
                     return JsonResponse({'Status': False, 'Errors': 'Неправильно указаны аргументы'})
                 else:
                     if is_updated:
-                        new_order.send(sender=self.__class__, user_id=request.user.id)
+
+                        data = Order.objects.filter(user_id=request.user.id, id=request.data['id']).prefetch_related(
+                            'ordered_items__product_info__shop').annotate(
+                            total_sum=Sum(F('ordered_items__quantity') * F('ordered_items__product_info__price'))).distinct()
+
+                        serializer = OrderEmailSerializer(data, many=True)
+                        data = json.loads(json.dumps(serializer.data))
+                        new_order.send(sender=self.__class__, user_id=request.user.id, id=request.data['id'], data=data)
                         return JsonResponse({'Status': True})
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
 
